@@ -9,11 +9,14 @@ import android.widget.ImageView;
 public class RemoteComputerActivity extends AppCompatActivity {
   ImageView screen;
   boolean isImageOn = false;
+  BluetoothConnect bluetoothConnection;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_remote_computer);
+
+    bluetoothConnection = new BluetoothConnect(this);
 
     this.screen = findViewById(R.id.screen);
 
@@ -27,6 +30,7 @@ public class RemoteComputerActivity extends AppCompatActivity {
             } else {
               screen.setImageResource(0);
               isImageOn = false;
+              bluetoothConnection.disconnect();
             }
           }
         });
