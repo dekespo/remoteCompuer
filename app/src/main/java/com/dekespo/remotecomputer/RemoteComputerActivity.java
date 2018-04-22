@@ -16,8 +16,7 @@ public class RemoteComputerActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_remote_computer);
 
-    bluetoothConnection = new BluetoothConnect(this);
-
+    this.bluetoothConnection = new BluetoothConnect(this);
     this.screen = findViewById(R.id.screen);
 
     Button button = findViewById(R.id.bluetooth_button);
@@ -27,6 +26,7 @@ public class RemoteComputerActivity extends AppCompatActivity {
             if (!isImageOn) {
               screen.setImageResource(R.drawable.ic_launcher_background);
               isImageOn = true;
+              bluetoothConnection.connnect();
             } else {
               screen.setImageResource(0);
               isImageOn = false;

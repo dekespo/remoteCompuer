@@ -3,7 +3,6 @@ package com.dekespo.remotecomputer;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,6 +16,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,6 +40,7 @@ public class BluetoothConnect {
   private Handler handler;
   private BluetoothAdapter adapter;
   private ConnectedThread connectedThread;
+  private HashMap<String, String> pairedDevices;
 
   public BluetoothConnect(Activity activity) {
     Log.i(TAG, this.getClass().getName() + " started!");
@@ -55,20 +56,17 @@ public class BluetoothConnect {
           new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), requestActivityCode);
     }
 
+    this.pairedDevices = new HashMap<>();
     Set<BluetoothDevice> pairedDevices = this.adapter.getBondedDevices();
     if (pairedDevices.size() > 0) {
       // There are paired devices. Get the name and address of each paired device.
       for (BluetoothDevice device : pairedDevices) {
         String deviceName = device.getName();
-        String deviceHardwareAddress = device.getAddress(); // MAC address
+        String deviceHardwareAddress = device.getAddress();
+        this.pairedDevices.put("ONLY_THIS_ONE", deviceHardwareAddress);
         Log.i(TAG, "Already paired device " + deviceName + " " + deviceHardwareAddress);
       }
     }
-
-    // Register for broadcasts when a device is discovered.
-    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-    this.activity.registerReceiver(this.receiver, filter);
-    this.isReceiverRegistered = true;
 
     Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
     discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
@@ -82,9 +80,16 @@ public class BluetoothConnect {
     }
   }
 
-  //  public void connnect() {
-  //    (new ConnectedThread()).
-  //  }
+  public void connnect() {
+    // Register for broadcasts when a device is discovered.
+    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+    this.activity.registerReceiver(this.receiver, filter);
+    this.isReceiverRegistered = true;
+
+    BluetoothDevice device = adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE"));
+    Thread client = new Thread(new ConnectThread(device));
+    client.start();
+  }
 
   private interface MessageConstants {
     int MESSAGE_READ = 0;
@@ -92,63 +97,12 @@ public class BluetoothConnect {
     int MESSAGE_TOAST = 2;
   }
 
-  private class AcceptThread extends Thread {
-    private final BluetoothServerSocket serverSocket;
-
-    public AcceptThread() {
-      // Use a temporary object that is later assigned to serverSocket
-      // because serverSocket is final.
-      BluetoothServerSocket tmp = null;
-      try {
-        // MY_UUID is the app's UUID string, also used by the client code.
-        tmp = adapter.listenUsingRfcommWithServiceRecord("DEKE_REMOTE_COMPUTER", UUID.randomUUID());
-      } catch (IOException e) {
-        Log.e(TAG, "Socket's listen() method failed", e);
-      }
-      this.serverSocket = tmp;
-    }
-
-    @Override
-    public void run() {
-      BluetoothSocket socket = null;
-      // Keep listening until exception occurs or a socket is returned.
-      while (true) {
-        try {
-          socket = this.serverSocket.accept();
-        } catch (IOException e) {
-          Log.e(TAG, "Socket's accept() method failed", e);
-          break;
-        }
-
-        if (socket != null) {
-          // A connection was accepted. Perform work associated with
-          // the connection in a separate thread.
-          connectedThread = new ConnectedThread(socket);
-          try {
-            this.serverSocket.close();
-          } catch (IOException e) {
-            Log.e(TAG, e.toString());
-          }
-          break;
-        }
-      }
-    }
-
-    // Closes the connect socket and causes the thread to finish.
-    public void cancel() {
-      try {
-        serverSocket.close();
-      } catch (IOException e) {
-        Log.e(TAG, "Could not close the connect socket", e);
-      }
-    }
-  }
-
   private class ConnectThread extends Thread {
     private final BluetoothSocket socket;
     private final BluetoothDevice mmDevice;
 
     public ConnectThread(BluetoothDevice device) {
+      Log.i(TAG, "Connecting ConnectThread");
       // Use a temporary object that is later assigned to socket
       // because socket is final.
       BluetoothSocket tmp = null;
@@ -157,8 +111,9 @@ public class BluetoothConnect {
       try {
         // Get a BluetoothSocket to connect with the given BluetoothDevice.
         // MY_UUID is the app's UUID string, also used in the server code.
-        // TODO, check how to add the correct UUID
-        tmp = device.createRfcommSocketToServiceRecord(UUID.randomUUID());
+        tmp =
+            device.createRfcommSocketToServiceRecord(
+                UUID.fromString("04c6093b-0000-1000-8000-00805f9b34fb"));
       } catch (IOException e) {
         Log.e(TAG, "Socket's create() method failed", e);
       }
