@@ -113,7 +113,7 @@ public class BluetoothConnect {
         // MY_UUID is the app's UUID string, also used in the server code.
         tmp =
             device.createRfcommSocketToServiceRecord(
-                UUID.fromString("04c6093b-0000-1000-8000-00805f9b34fb"));
+                UUID.fromString("056f9f63-0000-1000-8000-00805f9b34fb"));
       } catch (IOException e) {
         Log.e(TAG, "Socket's create() method failed", e);
       }

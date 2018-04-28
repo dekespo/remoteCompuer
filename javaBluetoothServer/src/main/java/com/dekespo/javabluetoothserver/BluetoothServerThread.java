@@ -27,11 +27,11 @@ public class BluetoothServerThread extends Thread {
       local = LocalDevice.getLocalDevice();
       local.setDiscoverable(DiscoveryAgent.GIAC);
 
-      // TODO: Change the UUID value
-      UUID uuid = new UUID(80087355); // "04c6093b-0000-1000-8000-00805f9b34fb"
+      UUID uuid = new UUID(91201379); // "056f9f63-0000-1000-8000-00805f9b34fb"
       String url = "btspp://localhost:" + uuid.toString() + ";name=RemoteBluetooth";
       notifier = (StreamConnectionNotifier) Connector.open(url);
     } catch (Exception e) {
+      System.out.println("Make sure that the machine has bluetooth and it is turned on.");
       e.printStackTrace();
       return;
     }
