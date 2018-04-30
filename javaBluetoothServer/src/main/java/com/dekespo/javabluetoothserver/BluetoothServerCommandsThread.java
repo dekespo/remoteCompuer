@@ -7,56 +7,37 @@ import javax.microedition.io.StreamConnection;
 public class BluetoothServerCommandsThread extends Thread {
   // Constant that indicate command from devices
   private static final int EXIT_CMD = -1;
-  private static final int KEY_RIGHT = 1;
-  private static final int KEY_LEFT = 2;
-  private StreamConnection mConnection;
+  private StreamConnection streamConnection;
 
   public BluetoothServerCommandsThread(StreamConnection connection) {
-    mConnection = connection;
+    this.streamConnection = connection;
   }
 
   @Override
   public void run() {
     try {
       // prepare to receive data
-      InputStream inputStream = mConnection.openInputStream();
+      InputStream inputStream = this.streamConnection.openInputStream();
 
+      // TODO: Get some ID of the connected device
       System.out.println("A device is connected");
 
-      //      while (true) {
-      //        int command = inputStream.read();
-      //
-      //        if (command == EXIT_CMD) {
-      //          System.out.println("finish process");
-      //          break;
-      //        }
-      //        processCommand(command);
-      //      }
+      while (true) {
+        int command = inputStream.read();
+
+        processCommand(command);
+
+        if (command == EXIT_CMD) {
+          System.out.println("A device is disconnected");
+          break;
+        }
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  //  /**
-  //   * Process the command from client
-  //   *
-  //   * @param command the command code
-  //   */
-  //  private void processCommand(int command) {
-  //    try {
-  //      Robot robot = new Robot();
-  //      switch (command) {
-  //        case KEY_RIGHT:
-  //          robot.keyPress(KeyEvent.VK_RIGHT);
-  //          System.out.println("Right");
-  //          break;
-  //        case KEY_LEFT:
-  //          robot.keyPress(KeyEvent.VK_LEFT);
-  //          System.out.println("Left");
-  //          break;
-  //      }
-  //    } catch (Exception e) {
-  //      e.printStackTrace();
-  //    }
-  //  }
+  private void processCommand(int command) {
+    System.out.println("This is the command " + Integer.toString(command));
+  }
 }
