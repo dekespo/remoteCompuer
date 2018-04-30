@@ -6,17 +6,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.dekespo.remotecomputer.bluetooth.BluetoothConnection;
+
 public class RemoteComputerActivity extends AppCompatActivity {
   ImageView screen;
   boolean isImageOn = false;
-  BluetoothConnect bluetoothConnection;
+  BluetoothConnection bluetoothConnection;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_remote_computer);
 
-    this.bluetoothConnection = new BluetoothConnect(this);
+    this.bluetoothConnection = new BluetoothConnection(this);
     this.screen = findViewById(R.id.screen);
 
     Button button = findViewById(R.id.bluetooth_button);
