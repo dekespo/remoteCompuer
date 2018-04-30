@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">remoteComputer</string>
-    <string name="bluetooth_button_name">Connect</string>
+    <string name="bluetooth_button_connect">Connect</string>
+    <string name="bluetooth_button_disconnect">Disconnect</string>
 </resources>
