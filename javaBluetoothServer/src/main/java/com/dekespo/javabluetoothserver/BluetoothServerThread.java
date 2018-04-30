@@ -11,20 +11,12 @@ public class BluetoothServerThread extends Thread {
 
   @Override
   public void run() {
-    waitForConnection();
-  }
-
-  /** Waiting for connection from devices */
-  private void waitForConnection() {
-    // retrieve the local Bluetooth device object
-    LocalDevice local = null;
-
     StreamConnectionNotifier notifier;
-    StreamConnection connection = null;
 
     // setup the server to listen for connection
     try {
-      local = LocalDevice.getLocalDevice();
+      // retrieve the local Bluetooth device object
+      LocalDevice local = LocalDevice.getLocalDevice();
       local.setDiscoverable(DiscoveryAgent.GIAC);
 
       UUID uuid = new UUID(91201379); // "056f9f63-0000-1000-8000-00805f9b34fb"
@@ -40,7 +32,7 @@ public class BluetoothServerThread extends Thread {
     while (true) {
       try {
         System.out.println("waiting for connection...");
-        connection = notifier.acceptAndOpen();
+        StreamConnection connection = notifier.acceptAndOpen();
 
         Thread processThread = new Thread(new BluetoothServerCommandsThread(connection));
         processThread.start();
