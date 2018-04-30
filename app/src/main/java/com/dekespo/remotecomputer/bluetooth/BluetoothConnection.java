@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
+import android.widget.Button;
+
+import com.dekespo.remotecomputer.R;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -32,6 +35,7 @@ public class BluetoothConnection {
   private HashMap<String, String> pairedDevices;
   private ClientThread clientThread;
   private SocketManagerThread socketManagerThread;
+  private Button connectionButton;
 
   public BluetoothConnection(Activity activity) {
     Log.i(TAG, this.getClass().getName() + " started!");
@@ -41,6 +45,7 @@ public class BluetoothConnection {
     }
 
     this.activity = activity;
+    this.connectionButton = this.activity.findViewById(R.id.bluetooth_button);
     if (!this.adapter.isEnabled()) {
       int requestActivityCode = 0;
       this.activity.startActivityForResult(
@@ -71,6 +76,7 @@ public class BluetoothConnection {
       this.socketManagerThread.close();
       this.clientThread = null;
       this.socketManagerThread = null;
+      this.connectionButton.setText(R.string.bluetooth_button_connect);
     }
   }
 
@@ -87,5 +93,6 @@ public class BluetoothConnection {
         new SocketManagerThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
     this.socketManagerThread.start();
     this.clientThread = this.socketManagerThread.getClientThread();
+    this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }
 }
