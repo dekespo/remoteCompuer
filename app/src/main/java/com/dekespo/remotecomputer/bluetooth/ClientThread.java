@@ -4,21 +4,21 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class ClientThread extends Thread {
   private static final String TAG = "BLUETOOTH_CONNECT";
   private static final int STREAM_BUFFER_LIMIT = 1024;
   private final SocketManagerThread socketManagerThread;
   private final InputStream inputStream;
+  private final OutputStream outputStream;
 
   public ClientThread(SocketManagerThread socketManagerThread) {
     this.socketManagerThread = socketManagerThread;
 
-    InputStream mutableInputStream = this.socketManagerThread.getInputStream();
-    //    OutputStream mutableOutputStream = this.socketManagerThread.getOutputStream();
-
-    this.inputStream = mutableInputStream;
-    //    this.outputStream = mutableOutputStream;
+    this.inputStream = this.socketManagerThread.getInputStream();
+    this.outputStream = this.socketManagerThread.getOutputStream();
   }
 
   @Override
@@ -34,6 +34,16 @@ public class ClientThread extends Thread {
         this.socketManagerThread.close();
         break;
       }
+    }
+  }
+
+  public void send(String commandName) {
+    try {
+      byte[] bytesToSend = commandName.getBytes(Charset.defaultCharset());
+      this.outputStream.write(bytesToSend);
+    } catch (IOException e) {
+      Log.e(TAG, "Error occurred when sending data", e);
+      this.socketManagerThread.close();
     }
   }
 }

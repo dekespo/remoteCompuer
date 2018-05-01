@@ -93,6 +93,7 @@ public class BluetoothConnection {
         new SocketManagerThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
     this.socketManagerThread.start();
     this.clientThread = this.socketManagerThread.getClientThread();
+    this.clientThread.send("Se"); // S of Screen
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }
 }

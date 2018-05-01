@@ -45,6 +45,14 @@ public class SocketManagerThread extends Thread {
   }
 
   public ClientThread getClientThread() {
+    while (this.clientThread == null) {
+      try {
+        Thread.sleep(100);
+        Log.w(TAG, "Waiting for the client thread to run");
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
     return this.clientThread;
   }
 
