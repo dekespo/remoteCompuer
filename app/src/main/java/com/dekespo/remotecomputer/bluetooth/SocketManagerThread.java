@@ -12,7 +12,6 @@ import java.util.UUID;
 public class SocketManagerThread extends Thread {
   private static final String TAG = "BLUETOOTH_CONNECT";
   private final BluetoothSocket socket;
-  private ClientThread clientThread;
 
   public SocketManagerThread(BluetoothDevice device) {
     Log.i(TAG, "Starting SocketManagerThread");
@@ -32,28 +31,11 @@ public class SocketManagerThread extends Thread {
   @Override
   public void run() {
     try {
-      // Connect to the remote device through the socket. This call blocks
-      // until it succeeds or throws an exception.
       this.socket.connect();
-    } catch (IOException ignored) {
+    } catch (IOException e) {
+      Log.e(TAG, "Socket could not start", e);
       return;
     }
-
-    // The connection attempt succeeded. Perform work associated with
-    // the connection in a separate thread.
-    this.clientThread = new ClientThread(this);
-  }
-
-  public ClientThread getClientThread() {
-    while (this.clientThread == null) {
-      try {
-        Thread.sleep(100);
-        Log.w(TAG, "Waiting for the client thread to run");
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
-    return this.clientThread;
   }
 
   public void close() {
@@ -82,6 +64,21 @@ public class SocketManagerThread extends Thread {
       e.printStackTrace();
       close();
       return null;
+    }
+  }
+
+  public boolean isConnected() {
+    return this.socket.isConnected();
+  }
+
+  public void waitForMe() {
+    while (!isConnected()) {
+      try {
+        Thread.sleep(100);
+        Log.w(TAG, "Waiting for the bluetooth socket to be connected");
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
   }
 }

@@ -34,7 +34,6 @@ public class BluetoothConnection {
   private BluetoothAdapter adapter;
   private HashMap<String, String> pairedDevices;
   private ClientThread clientThread;
-  private SocketManagerThread socketManagerThread;
   private Button connectionButton;
 
   public BluetoothConnection(Activity activity) {
@@ -73,9 +72,13 @@ public class BluetoothConnection {
     if (isReceiverRegistered) {
       this.activity.unregisterReceiver(this.receiver);
       this.isReceiverRegistered = false;
-      this.socketManagerThread.close();
+      this.clientThread.close();
+      try {
+        this.clientThread.join();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       this.clientThread = null;
-      this.socketManagerThread = null;
       this.connectionButton.setText(R.string.bluetooth_button_connect);
     }
   }
@@ -89,10 +92,9 @@ public class BluetoothConnection {
     // Cancel discovery because it otherwise slows down the connection.
     this.adapter.cancelDiscovery();
 
-    this.socketManagerThread =
-        new SocketManagerThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
-    this.socketManagerThread.start();
-    this.clientThread = this.socketManagerThread.getClientThread();
+    this.clientThread =
+        new ClientThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
+    this.clientThread.start();
     this.clientThread.send("Se"); // S of Screen
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }

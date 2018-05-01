@@ -1,5 +1,6 @@
 package com.dekespo.remotecomputer.bluetooth;
 
+import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
 import java.io.IOException;
@@ -9,13 +10,14 @@ import java.nio.charset.Charset;
 
 public class ClientThread extends Thread {
   private static final String TAG = "BLUETOOTH_CONNECT";
-  private static final int STREAM_BUFFER_LIMIT = 1024;
   private final SocketManagerThread socketManagerThread;
   private final InputStream inputStream;
   private final OutputStream outputStream;
 
-  public ClientThread(SocketManagerThread socketManagerThread) {
-    this.socketManagerThread = socketManagerThread;
+  public ClientThread(BluetoothDevice device) {
+    this.socketManagerThread = new SocketManagerThread(device);
+    this.socketManagerThread.start();
+    this.socketManagerThread.waitForMe();
 
     this.inputStream = this.socketManagerThread.getInputStream();
     this.outputStream = this.socketManagerThread.getOutputStream();
@@ -23,12 +25,10 @@ public class ClientThread extends Thread {
 
   @Override
   public void run() {
-    byte[] streamBuffer = new byte[STREAM_BUFFER_LIMIT];
-
-    while (true) {
+    while (this.socketManagerThread.isConnected()) {
       try {
-        int numberOfBytesReturned = this.inputStream.read(streamBuffer);
-        Log.i(TAG, "I got these many bytes = " + Integer.toString(numberOfBytesReturned));
+        int command = this.inputStream.read();
+        Log.i(TAG, "Got this characther " + (char) command);
       } catch (IOException e) {
         Log.e(TAG, "Input stream was disconnected", e);
         this.socketManagerThread.close();
@@ -44,6 +44,15 @@ public class ClientThread extends Thread {
     } catch (IOException e) {
       Log.e(TAG, "Error occurred when sending data", e);
       this.socketManagerThread.close();
+    }
+  }
+
+  public void close() {
+    this.socketManagerThread.close();
+    try {
+      this.socketManagerThread.join();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
   }
 }

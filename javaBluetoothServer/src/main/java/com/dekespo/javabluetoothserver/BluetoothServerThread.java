@@ -28,7 +28,6 @@ public class BluetoothServerThread extends Thread {
       return;
     }
 
-    //     waiting for connection
     while (true) {
       try {
         System.out.println("waiting for connection...");
