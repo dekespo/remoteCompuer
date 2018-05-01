@@ -5,8 +5,7 @@ import java.io.InputStream;
 import javax.microedition.io.StreamConnection;
 
 public class BluetoothServerCommandsThread extends Thread {
-  // Constant that indicate command from devices
-  private static final int EXIT_CMD = -1;
+  private static final int EXIT_COMMAND = -1;
   private StreamConnection streamConnection;
 
   public BluetoothServerCommandsThread(StreamConnection connection) {
@@ -27,10 +26,11 @@ public class BluetoothServerCommandsThread extends Thread {
 
         processCommand(command);
 
-        if (command == EXIT_CMD) {
-          System.out.println("A device is disconnected");
+        if (command == EXIT_COMMAND) {
+          System.out.println("The device is disconnected");
           break;
-        }
+        } else if (command == (int) 'S') System.out.println("Asked for the screen");
+        else System.out.println("Unknown command sent: " + (char) command);
       }
     } catch (Exception e) {
       e.printStackTrace();
