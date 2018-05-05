@@ -8,9 +8,11 @@ import java.nio.charset.Charset;
 import javax.microedition.io.StreamConnection;
 
 public class BluetoothServerCommandsThread extends Thread {
+  private final int MAXIMUM_BYTE_LIMIT = 1024;
   private StreamConnection streamConnection;
   private InputStream inputStream;
   private OutputStream outputStream;
+  private String deviceName = null;
 
   public BluetoothServerCommandsThread(StreamConnection connection) {
     this.streamConnection = connection;
@@ -18,43 +20,67 @@ public class BluetoothServerCommandsThread extends Thread {
 
   @Override
   public void run() {
-    try {
 
-      if (!openStream()) return;
+    if (!openStream()) return;
 
-      // TODO: Get some ID of the connected device
-      System.out.println("A device is connected");
+    boolean doOnce = true;
 
-      while (true) {
-        int command = this.inputStream.read();
-        if (command == -1) { // -1 means exit
-          System.out.println("The device is disconnected");
-          break;
-        }
-        processCommand(command);
+    while (true) {
+      String data = receiveData();
+      if (data == null) {
+        System.out.println("The device \"" + this.deviceName + "\" is disconnected");
+        break;
       }
-    } catch (IOException e) {
-      e.printStackTrace();
+      data = processData(data);
+      if (data != null) sendData(data);
+
+      if (doOnce && this.deviceName != null) {
+        System.out.println("The device  \"" + this.deviceName + "\" is connected");
+        doOnce = false;
+      }
     }
 
     closeStream();
   }
 
-  private void processCommand(int command) {
-    switch ((char) command) {
-      case 'S':
-        System.out.println("Asked for the screen");
-        byte[] serverBytes = "Cl".getBytes(Charset.defaultCharset());
-        try {
-          this.outputStream.write(serverBytes);
-          System.out.println("Server sends bytes");
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        break;
-      default:
-        System.out.println("Unknown command received: " + (char) command);
+  private String receiveData() {
+    try {
+      byte[] byteData = new byte[MAXIMUM_BYTE_LIMIT];
+      int result = this.inputStream.read(byteData);
+      if (result == -1) return null;
+      return new String(byteData);
+    } catch (IOException e) {
+      e.printStackTrace();
+      closeStream();
+      return null;
     }
+  }
+
+  private void sendData(String data) {
+    try {
+      data.trim();
+      this.outputStream.flush();
+      byte[] bytesToSend = data.getBytes(Charset.defaultCharset());
+      this.outputStream.write(bytesToSend);
+    } catch (IOException e) {
+      e.printStackTrace();
+      closeStream();
+    }
+  }
+
+  private String processData(String data) {
+    String[] keyValue = data.split("\\|");
+    switch (keyValue[0]) {
+      case "HANDSHAKE":
+        this.deviceName = keyValue[1];
+        break;
+      case "SCREEN":
+        return "Cl";
+      default:
+        System.out.println("Unknown data received: " + data);
+        break;
+    }
+    return null;
   }
 
   private boolean openStream() {
@@ -70,8 +96,7 @@ public class BluetoothServerCommandsThread extends Thread {
 
   private void closeStream() {
     try {
-      this.inputStream.close();
-      this.outputStream.close();
+      this.streamConnection.close();
     } catch (IOException e) {
       e.printStackTrace();
     }

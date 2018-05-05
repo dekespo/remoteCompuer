@@ -37,9 +37,11 @@ public class ClientThread extends Thread {
     }
   }
 
-  public void send(String commandName) {
+  public void sendData(String data) {
     try {
-      byte[] bytesToSend = commandName.getBytes(Charset.defaultCharset());
+      data.trim();
+      this.outputStream.flush();
+      byte[] bytesToSend = data.getBytes(Charset.defaultCharset());
       this.outputStream.write(bytesToSend);
     } catch (IOException e) {
       Log.e(TAG, "Error occurred when sending data", e);
