@@ -8,13 +8,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-public class ClientThread extends Thread {
+public class ClientConnectionThread extends Thread {
   private static final String TAG = "BLUETOOTH_CONNECT";
   private final SocketManagerThread socketManagerThread;
   private final InputStream inputStream;
   private final OutputStream outputStream;
 
-  public ClientThread(BluetoothDevice device) {
+  public ClientConnectionThread(BluetoothDevice device) {
     this.socketManagerThread = new SocketManagerThread(device);
     this.socketManagerThread.start();
     this.socketManagerThread.waitForMe();

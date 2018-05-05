@@ -15,7 +15,8 @@ import com.dekespo.remotecomputer.R;
 import java.util.HashMap;
 import java.util.Set;
 
-public class BluetoothConnection {
+public class BluetoothActivity
+{
   private final String TAG = "BLUETOOTH_CONNECT";
   private final String MY_DEVICE_NAME = "ONLY_THIS_ONE";
   private final BroadcastReceiver receiver =
@@ -34,10 +35,10 @@ public class BluetoothConnection {
   private boolean isReceiverRegistered = false;
   private BluetoothAdapter adapter;
   private HashMap<String, String> pairedDevices;
-  private ClientThread clientThread;
+  private ClientConnectionThread clientConnectionThread;
   private Button connectionButton;
 
-  public BluetoothConnection(Activity activity) {
+  public BluetoothActivity(Activity activity) {
     Log.i(TAG, this.getClass().getName() + " started!");
     this.adapter = BluetoothAdapter.getDefaultAdapter();
     if (this.adapter == null) {
@@ -73,13 +74,13 @@ public class BluetoothConnection {
     if (isReceiverRegistered) {
       this.activity.unregisterReceiver(this.receiver);
       this.isReceiverRegistered = false;
-      this.clientThread.close();
+      this.clientConnectionThread.close();
       try {
-        this.clientThread.join();
+        this.clientConnectionThread.join();
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      this.clientThread = null;
+      this.clientConnectionThread = null;
       this.connectionButton.setText(R.string.bluetooth_button_connect);
     }
   }
@@ -93,17 +94,17 @@ public class BluetoothConnection {
     // Cancel discovery because it otherwise slows down the connection.
     this.adapter.cancelDiscovery();
 
-    this.clientThread =
-        new ClientThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
-    this.clientThread.start();
-    this.clientThread.sendData(
+    this.clientConnectionThread =
+        new ClientConnectionThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
+    this.clientConnectionThread.start();
+    this.clientConnectionThread.sendData(
         "HANDSHAKE"
             + "|"
             + "Name is "
             + MY_DEVICE_NAME
             + ", Address is "
             + this.pairedDevices.get(MY_DEVICE_NAME));
-    this.clientThread.sendData("SCREEN|");
+    this.clientConnectionThread.sendData("SCREEN|");
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }
 }

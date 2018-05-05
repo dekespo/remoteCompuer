@@ -6,19 +6,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.dekespo.remotecomputer.bluetooth.BluetoothConnection;
+import com.dekespo.remotecomputer.bluetooth.BluetoothActivity;
 
 public class RemoteComputerActivity extends AppCompatActivity {
   ImageView screen;
   boolean isImageOn = false;
-  BluetoothConnection bluetoothConnection;
+  BluetoothActivity bluetoothActivity;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_remote_computer);
 
-    this.bluetoothConnection = new BluetoothConnection(this);
+    this.bluetoothActivity = new BluetoothActivity(this);
     this.screen = findViewById(R.id.screen);
 
     Button button = findViewById(R.id.bluetooth_button);
@@ -28,11 +28,11 @@ public class RemoteComputerActivity extends AppCompatActivity {
             if (!isImageOn) {
               screen.setImageResource(R.drawable.ic_launcher_background);
               isImageOn = true;
-              bluetoothConnection.connnect();
+              bluetoothActivity.connnect();
             } else {
               screen.setImageResource(0);
               isImageOn = false;
-              bluetoothConnection.disconnect();
+              bluetoothActivity.disconnect();
             }
           }
         });
