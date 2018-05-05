@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver;
+package com.dekespo.javabluetoothserver.Bluetooth;
 
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
@@ -7,7 +7,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
 
-public class BluetoothServerThread extends Thread {
+public class ServerManagerThread extends Thread {
 
   @Override
   public void run() {
@@ -33,7 +33,7 @@ public class BluetoothServerThread extends Thread {
         System.out.println("waiting for connection...");
         StreamConnection connection = notifier.acceptAndOpen();
 
-        Thread processThread = new Thread(new BluetoothServerCommandsThread(connection));
+        Thread processThread = new Thread(new ServerConnectionThread(connection));
         processThread.start();
       } catch (Exception e) {
         e.printStackTrace();
