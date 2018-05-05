@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver.Bluetooth;
+package com.dekespo.javabluetoothserver.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +41,7 @@ public class ServerConnectionThread extends Thread {
     }
 
     closeStream();
+    System.out.println("waiting for connection...");
   }
 
   private String receiveData() {

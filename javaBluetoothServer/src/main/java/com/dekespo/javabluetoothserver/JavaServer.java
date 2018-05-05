@@ -1,6 +1,6 @@
 package com.dekespo.javabluetoothserver;
 
-import com.dekespo.javabluetoothserver.Bluetooth.ServerManagerThread;
+import com.dekespo.javabluetoothserver.bluetooth.ServerManagerThread;
 
 public class JavaServer {
   public static void main(String[] args) {
