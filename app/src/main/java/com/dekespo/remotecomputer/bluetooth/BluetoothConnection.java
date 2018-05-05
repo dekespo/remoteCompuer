@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class BluetoothConnection {
-  private static final String TAG = "BLUETOOTH_CONNECT";
+  private final String TAG = "BLUETOOTH_CONNECT";
+  private final String MY_DEVICE_NAME = "ONLY_THIS_ONE";
   private final BroadcastReceiver receiver =
       new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -58,7 +59,7 @@ public class BluetoothConnection {
       for (BluetoothDevice device : pairedDevices) {
         String deviceName = device.getName();
         String deviceHardwareAddress = device.getAddress();
-        this.pairedDevices.put("ONLY_THIS_ONE", deviceHardwareAddress);
+        this.pairedDevices.put(MY_DEVICE_NAME, deviceHardwareAddress);
         Log.i(TAG, "Already paired device " + deviceName + " " + deviceHardwareAddress);
       }
     }
@@ -95,7 +96,14 @@ public class BluetoothConnection {
     this.clientThread =
         new ClientThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
     this.clientThread.start();
-    this.clientThread.send("Se"); // S of Screen
+    this.clientThread.sendData(
+        "HANDSHAKE"
+            + "|"
+            + "Name is "
+            + MY_DEVICE_NAME
+            + ", Address is "
+            + this.pairedDevices.get(MY_DEVICE_NAME));
+    this.clientThread.sendData("SCREEN|");
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }
 }
