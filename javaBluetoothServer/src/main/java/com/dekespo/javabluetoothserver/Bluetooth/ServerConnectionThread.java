@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver;
+package com.dekespo.javabluetoothserver.Bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,14 +7,14 @@ import java.nio.charset.Charset;
 
 import javax.microedition.io.StreamConnection;
 
-public class BluetoothServerCommandsThread extends Thread {
+public class ServerConnectionThread extends Thread {
   private final int MAXIMUM_BYTE_LIMIT = 1024;
   private StreamConnection streamConnection;
   private InputStream inputStream;
   private OutputStream outputStream;
   private String deviceName = null;
 
-  public BluetoothServerCommandsThread(StreamConnection connection) {
+  public ServerConnectionThread(StreamConnection connection) {
     this.streamConnection = connection;
   }
 
