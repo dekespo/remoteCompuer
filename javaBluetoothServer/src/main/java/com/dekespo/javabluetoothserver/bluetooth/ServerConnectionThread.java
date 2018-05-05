@@ -41,6 +41,7 @@ public class ServerConnectionThread extends Thread {
     }
 
     closeStream();
+    System.out.println("waiting for connection...");
   }
 
   private String receiveData() {

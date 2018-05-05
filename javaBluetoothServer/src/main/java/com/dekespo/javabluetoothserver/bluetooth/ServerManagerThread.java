@@ -13,9 +13,7 @@ public class ServerManagerThread extends Thread {
   public void run() {
     StreamConnectionNotifier notifier;
 
-    // setup the server to listen for connection
     try {
-      // retrieve the local Bluetooth device object
       LocalDevice local = LocalDevice.getLocalDevice();
       local.setDiscoverable(DiscoveryAgent.GIAC);
 
@@ -28,9 +26,9 @@ public class ServerManagerThread extends Thread {
       return;
     }
 
+    System.out.println("waiting for connection...");
     while (true) {
       try {
-        System.out.println("waiting for connection...");
         StreamConnection connection = notifier.acceptAndOpen();
 
         Thread processThread = new Thread(new ServerConnectionThread(connection));
