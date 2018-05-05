@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver.Bluetooth;
+package com.dekespo.javabluetoothserver.bluetooth;
 
 import java.io.IOException;
 import java.io.InputStream;

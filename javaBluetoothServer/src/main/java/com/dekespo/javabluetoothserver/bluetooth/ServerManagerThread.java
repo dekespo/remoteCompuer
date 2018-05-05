@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver.Bluetooth;
+package com.dekespo.javabluetoothserver.bluetooth;
 
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.LocalDevice;
