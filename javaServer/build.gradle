@@ -3,7 +3,7 @@ apply plugin: 'application'
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-mainClassName = 'com.dekespo.javabluetoothserver.JavaServer'
+mainClassName = 'com.dekespo.javaserver.JavaServer'
 
 sourceSets.main.java.srcDirs += "$projectDir\\..\\common\\src\\main\\java"
 

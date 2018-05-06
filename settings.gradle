@@ -1,1 +1,1 @@
-include ':app', ':javaBluetoothServer'
+include ':app', ':javaServer'
