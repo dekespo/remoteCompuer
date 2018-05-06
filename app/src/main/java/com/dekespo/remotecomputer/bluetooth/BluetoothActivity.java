@@ -15,8 +15,7 @@ import com.dekespo.remotecomputer.R;
 import java.util.HashMap;
 import java.util.Set;
 
-public class BluetoothActivity
-{
+public class BluetoothActivity {
   private final String TAG = "BLUETOOTH_CONNECT";
   private final String MY_DEVICE_NAME = "ONLY_THIS_ONE";
   private final BroadcastReceiver receiver =
@@ -37,6 +36,7 @@ public class BluetoothActivity
   private HashMap<String, String> pairedDevices;
   private ClientConnectionThread clientConnectionThread;
   private Button connectionButton;
+  private SocketManagerThread socketManagerThread;
 
   public BluetoothActivity(Activity activity) {
     Log.i(TAG, this.getClass().getName() + " started!");
@@ -74,13 +74,15 @@ public class BluetoothActivity
     if (isReceiverRegistered) {
       this.activity.unregisterReceiver(this.receiver);
       this.isReceiverRegistered = false;
-      this.clientConnectionThread.close();
+      this.clientConnectionThread.closeStream(); // Closes the both
       try {
         this.clientConnectionThread.join();
+        this.socketManagerThread.join();
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
       this.clientConnectionThread = null;
+      this.socketManagerThread = null;
       this.connectionButton.setText(R.string.bluetooth_button_connect);
     }
   }
@@ -94,8 +96,12 @@ public class BluetoothActivity
     // Cancel discovery because it otherwise slows down the connection.
     this.adapter.cancelDiscovery();
 
+    this.socketManagerThread =
+        new SocketManagerThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
+    this.socketManagerThread.start();
+    this.socketManagerThread.waitForMe();
     this.clientConnectionThread =
-        new ClientConnectionThread(this.adapter.getRemoteDevice(pairedDevices.get("ONLY_THIS_ONE")));
+        new ClientConnectionThread(this.socketManagerThread.JavaIOStreamConnection());
     this.clientConnectionThread.start();
     this.clientConnectionThread.sendData(
         "HANDSHAKE"

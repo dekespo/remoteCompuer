@@ -1,60 +1,39 @@
 package com.dekespo.remotecomputer.bluetooth;
 
-import android.bluetooth.BluetoothDevice;
 import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import com.dekespo.commonclasses.ConnectionThread;
+import com.dekespo.commonclasses.IStreamConnection;
 
-public class ClientConnectionThread extends Thread {
-  private static final String TAG = "BLUETOOTH_CONNECT";
-  private final SocketManagerThread socketManagerThread;
-  private final InputStream inputStream;
-  private final OutputStream outputStream;
+public class ClientConnectionThread extends ConnectionThread {
+  private final String TAG = "BLUETOOTH_CONNECT";
 
-  public ClientConnectionThread(BluetoothDevice device) {
-    this.socketManagerThread = new SocketManagerThread(device);
-    this.socketManagerThread.start();
-    this.socketManagerThread.waitForMe();
-
-    this.inputStream = this.socketManagerThread.getInputStream();
-    this.outputStream = this.socketManagerThread.getOutputStream();
+  public ClientConnectionThread(IStreamConnection connection) {
+    super(connection);
+    openStream();
   }
 
   @Override
   public void run() {
-    while (this.socketManagerThread.isConnected()) {
-      try {
-        int command = this.inputStream.read();
-        Log.i(TAG, "Got this characther " + (char) command);
-      } catch (IOException e) {
-        Log.e(TAG, "Input stream was disconnected", e);
-        this.socketManagerThread.close();
+
+    if (!openStream()) return;
+
+    while (true) {
+      String data = receiveData();
+      if (data == null) {
+        Log.w(TAG, "The stream is disconnected");
         break;
       }
+      data = processData(data);
+      if (data != null) sendData(data);
     }
+
+    closeStream();
   }
 
-  public void sendData(String data) {
-    try {
-      data.trim();
-      this.outputStream.flush();
-      byte[] bytesToSend = data.getBytes(Charset.defaultCharset());
-      this.outputStream.write(bytesToSend);
-    } catch (IOException e) {
-      Log.e(TAG, "Error occurred when sending data", e);
-      this.socketManagerThread.close();
-    }
-  }
-
-  public void close() {
-    this.socketManagerThread.close();
-    try {
-      this.socketManagerThread.join();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+  @Override
+  public String processData(String data) {
+    Log.i(TAG, "Got this data " + data);
+    return null;
   }
 }
