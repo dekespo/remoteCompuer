@@ -1,4 +1,4 @@
-package com.dekespo.javabluetoothserver.bluetooth;
+package com.dekespo.javaserver.bluetooth;
 
 import com.dekespo.commonclasses.IStreamConnection;
 import com.dekespo.commonclasses.ManagerThread;
