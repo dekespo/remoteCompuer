@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Button;
 
+import com.dekespo.commonclasses.DataMessage;
 import com.dekespo.remotecomputer.R;
 
 import java.util.HashMap;
@@ -104,13 +105,13 @@ public class BluetoothActivity {
         new ClientConnectionThread(this.socketManagerThread.JavaIOStreamConnection());
     this.clientConnectionThread.start();
     this.clientConnectionThread.sendData(
-        "HANDSHAKE"
-            + "|"
-            + "Name is "
-            + MY_DEVICE_NAME
-            + ", Address is "
-            + this.pairedDevices.get(MY_DEVICE_NAME));
-    this.clientConnectionThread.sendData("SCREEN|");
+        new DataMessage(
+            DataMessage.Tag.HANDSHAKE,
+            "Name is "
+                + MY_DEVICE_NAME
+                + ", Address is "
+                + this.pairedDevices.get(MY_DEVICE_NAME)));
+    this.clientConnectionThread.sendData(new DataMessage(DataMessage.Tag.SCREEN, ""));
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
   }
 }

@@ -17,12 +17,12 @@ public abstract class ConnectionThread extends Thread {
 
   public abstract void run();
 
-  public String receiveData() {
+  public DataMessage receiveData() {
     try {
       byte[] byteData = new byte[MAXIMUM_BYTE_LIMIT];
       int result = this.inputStream.read(byteData);
       if (result == -1) return null;
-      return new String(byteData).trim();
+      return new DataMessage(new String(byteData));
     } catch (IOException e) {
       e.printStackTrace();
       closeStream();
@@ -30,11 +30,10 @@ public abstract class ConnectionThread extends Thread {
     }
   }
 
-  public void sendData(String data) {
+  public void sendData(DataMessage dataMessage) {
     try {
-      data.trim();
       this.outputStream.flush();
-      byte[] bytesToSend = data.getBytes(Charset.defaultCharset());
+      byte[] bytesToSend = dataMessage.getDataMessage().getBytes(Charset.defaultCharset());
       this.outputStream.write(bytesToSend);
     } catch (IOException e) {
       e.printStackTrace();
@@ -42,7 +41,7 @@ public abstract class ConnectionThread extends Thread {
     }
   }
 
-  public abstract String processData(String data);
+  public abstract DataMessage processData(DataMessage dataMessage);
 
   public boolean openStream() {
     try {
