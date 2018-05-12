@@ -1,6 +1,7 @@
 package com.dekespo.javaserver.bluetooth;
 
 import com.dekespo.commonclasses.ConnectionThread;
+import com.dekespo.commonclasses.DataMessage;
 import com.dekespo.commonclasses.IStreamConnection;
 
 public class ServerConnectionThread extends ConnectionThread {
@@ -18,13 +19,13 @@ public class ServerConnectionThread extends ConnectionThread {
     boolean doOnce = true;
 
     while (true) {
-      String data = receiveData();
-      if (data == null) {
+      DataMessage dataMessage = receiveData();
+      if (dataMessage == null) {
         System.out.println("The device \"" + this.deviceName + "\" is disconnected");
         break;
       }
-      data = processData(data);
-      if (data != null) sendData(data);
+      dataMessage = processData(dataMessage);
+      if (dataMessage != null) sendData(dataMessage);
 
       if (doOnce && this.deviceName != null) {
         System.out.println("The device  \"" + this.deviceName + "\" is connected");
@@ -37,16 +38,15 @@ public class ServerConnectionThread extends ConnectionThread {
   }
 
   @Override
-  public String processData(String data) {
-    String[] keyValue = data.split("\\|");
-    switch (keyValue[0]) {
-      case "HANDSHAKE":
-        this.deviceName = keyValue[1];
+  public DataMessage processData(DataMessage dataMessage) {
+    switch (dataMessage.getTag()) {
+      case HANDSHAKE:
+        this.deviceName = dataMessage.getData();
         break;
-      case "SCREEN":
-        return "Hey Client!";
+      case SCREEN:
+        return new DataMessage(DataMessage.Tag.HANDSHAKE, "Hey Client!");
       default:
-        System.out.println("Unknown data received: " + data);
+        System.out.println("Unknown data received: " + dataMessage.getDataMessage());
         break;
     }
     return null;
