@@ -5,12 +5,12 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 
-public class Mouse {
+public class MouseManager {
 
   private Robot robot;
   private Point currentPosition;
 
-  public Mouse() {
+  public MouseManager() {
     this.currentPosition = MouseInfo.getPointerInfo().getLocation();
     try {
       this.robot = new Robot();
