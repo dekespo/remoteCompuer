@@ -1,9 +1,12 @@
 package com.dekespo.javaserver.monitor;
 
+import com.dekespo.commonclasses.MouseMessage;
+
 import java.awt.AWTException;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
+import java.awt.event.InputEvent;
 
 public class MouseManager {
 
@@ -19,31 +22,33 @@ public class MouseManager {
     }
   }
 
-  public void move(MouseDirections direction, int speed) {
+  public void move(MouseMessage data) {
     int x = (int) this.currentPosition.getX();
     int y = (int) this.currentPosition.getY();
-    switch (direction) {
-      case UP:
-        this.robot.mouseMove(x, y + speed);
-        break;
-      case DOWN:
-        this.robot.mouseMove(x, y - speed);
-        break;
-      case RIGHT:
-        this.robot.mouseMove(x + speed, y);
-        break;
-      case LEFT:
-        this.robot.mouseMove(x - speed, y);
-        break;
-    }
-    this.currentPosition = MouseInfo.getPointerInfo().getLocation();
+    this.robot.mouseMove(x + data.getVelocityX(), y + data.getVelocityY());
+    if (data.isFinal()) this.currentPosition = MouseInfo.getPointerInfo().getLocation();
     System.out.println(this.currentPosition);
   }
 
-  public enum MouseDirections {
-    UP,
-    DOWN,
-    RIGHT,
-    LEFT
+  public void click() {
+    this.robot.mousePress(InputEvent.BUTTON1_MASK);
+    this.robot.mouseRelease(InputEvent.BUTTON1_MASK);
+  }
+
+  public void command(MouseMessage data) {
+    switch (data.getMouseCommand()) {
+      case MOVE:
+        move(data);
+        break;
+      case CLICK:
+        click();
+        break;
+      case DOUBLE_CLICK:
+        click();
+        click();
+        break;
+      default:
+        throw new RuntimeException("Undefined MouseCommand data: " + data.toString());
+    }
   }
 }

@@ -3,12 +3,16 @@ package com.dekespo.javaserver.bluetooth;
 import com.dekespo.commonclasses.ConnectionThread;
 import com.dekespo.commonclasses.DataMessage;
 import com.dekespo.commonclasses.IStreamConnection;
+import com.dekespo.commonclasses.MouseMessage;
+import com.dekespo.javaserver.monitor.MouseManager;
 
 public class ServerConnectionThread extends ConnectionThread {
   private String deviceName = null;
+  private MouseManager mouseManager;
 
   public ServerConnectionThread(IStreamConnection connection) {
     super(connection);
+    this.mouseManager = new MouseManager();
   }
 
   @Override
@@ -45,6 +49,9 @@ public class ServerConnectionThread extends ConnectionThread {
         break;
       case SCREEN:
         return new DataMessage(DataMessage.Tag.HANDSHAKE, "Hey Client!");
+      case MOUSE:
+        this.mouseManager.command(new MouseMessage(dataMessage.getData()));
+        break;
       default:
         System.out.println("Unknown data received: " + dataMessage.getDataMessage());
         break;
