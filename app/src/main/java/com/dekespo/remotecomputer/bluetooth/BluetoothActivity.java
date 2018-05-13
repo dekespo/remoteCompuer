@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.Button;
 
 import com.dekespo.commonclasses.DataMessage;
+import com.dekespo.commonclasses.MouseMessage;
 import com.dekespo.remotecomputer.R;
 
 import java.util.HashMap;
@@ -113,5 +114,13 @@ public class BluetoothActivity {
                 + this.pairedDevices.get(MY_DEVICE_NAME)));
     this.clientConnectionThread.sendData(new DataMessage(DataMessage.Tag.SCREEN, ""));
     this.connectionButton.setText(R.string.bluetooth_button_disconnect);
+  }
+
+  public void sendMouseCommand(
+      MouseMessage.MouseCommand mouseCommand, float velocityX, float velocityY, boolean isFinal) {
+    this.clientConnectionThread.sendData(
+        new DataMessage(
+            DataMessage.Tag.MOUSE,
+            new MouseMessage(mouseCommand, (int) velocityX, (int) velocityY, isFinal).toString()));
   }
 }

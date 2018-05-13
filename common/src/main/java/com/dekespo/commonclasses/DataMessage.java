@@ -38,6 +38,7 @@ public class DataMessage {
 
   public enum Tag {
     HANDSHAKE,
-    SCREEN
+    SCREEN,
+    MOUSE
   }
 }
